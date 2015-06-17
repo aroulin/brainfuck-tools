@@ -4,8 +4,6 @@
 
 int main(int argc, const char* argv[]) {
 
-    std::cout << argc << std::endl;
-
     if(argc == 1) {
         brainfuck::interpret(std::cin, std::cout);
     } else if(argc == 2) {
