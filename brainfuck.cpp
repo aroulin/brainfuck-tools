@@ -1,9 +1,9 @@
 #include "brainfuck.h"
 #include <iostream>
 
-void brainfuck::interpret(std::istream & istream, std::ostream & ostream) {
+void Brainfuck::Interpret(std::istream &istream, std::ostream &ostream) {
     std::string str;
-    while(istream >> str) {
+    while (istream >> str) {
         ostream << str;
     }
 }
