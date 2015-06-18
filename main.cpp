@@ -17,8 +17,7 @@ int main(int argc, const char *argv[]) {
     }
 
     std::vector<char> program;
-    if (!file.eof() && !file.fail())
-    {
+    if (!file.eof() && !file.fail()) {
         file.seekg(0, std::ios_base::end);
         std::streampos file_size = file.tellg();
         program.resize(file_size);

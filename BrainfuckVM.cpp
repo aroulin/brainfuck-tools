@@ -1,15 +1,15 @@
 #include <iostream>
 #include "BrainfuckVM.h"
 
-BrainfuckVM::BrainfuckVM(std::istream & input_stream, std::ostream & output_stream) : input_stream(&input_stream),
-                                                                                      output_stream(&output_stream) {
+BrainfuckVM::BrainfuckVM(std::istream &input_stream, std::ostream &output_stream) : input_stream(&input_stream),
+                                                                                    output_stream(&output_stream) {
 }
 
-void BrainfuckVM::Interpret(std::vector<char> & program) {
+void BrainfuckVM::Interpret(std::vector<char> &program) {
     this->program = program;
     reset();
 
-    while(instr_pointer < program.size()) {
+    while (instr_pointer < program.size()) {
         Step(program[instr_pointer]);
     }
 
@@ -24,7 +24,7 @@ void BrainfuckVM::reset() {
 }
 
 void BrainfuckVM::Step(char cmd) {
-    switch(cmd) {
+    switch (cmd) {
         case '>':
             data_pointer++;
             break;
@@ -44,31 +44,31 @@ void BrainfuckVM::Step(char cmd) {
             *input_stream >> memory[data_pointer];
             break;
         case '[':
-            if(memory[data_pointer] == 0) {
+            if (memory[data_pointer] == 0) {
                 // Jump after corresponding ']'
                 unsigned remaining = 1;
                 do {
                     instr_pointer++;
-                    if(program[instr_pointer] == '[') {
+                    if (program[instr_pointer] == '[') {
                         remaining++;
-                    } else if(program[instr_pointer] == ']') {
+                    } else if (program[instr_pointer] == ']') {
                         remaining--;
                     }
-                } while(remaining != 0);
+                } while (remaining != 0);
             }
             break;
         case ']':
-            if(memory[data_pointer] != 0) {
+            if (memory[data_pointer] != 0) {
                 // Jump after corresponding '['
                 unsigned remaining = 1;
                 do {
                     instr_pointer--;
-                    if(program[instr_pointer] == ']') {
+                    if (program[instr_pointer] == ']') {
                         remaining++;
-                    } else if(program[instr_pointer] == '[') {
+                    } else if (program[instr_pointer] == '[') {
                         remaining--;
                     }
-                } while(remaining != 0);
+                } while (remaining != 0);
             }
             break;
         default:
