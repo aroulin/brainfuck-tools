@@ -7,6 +7,7 @@ int main(int argc, const char *argv[]) {
     if (argc != 2) {
         std::cout << "USAGE:" << std::endl
         << "brainfuck-jit program.bf" << std::endl;
+        std::exit(EXIT_SUCCESS);
     }
 
     std::ifstream file(argv[1]);

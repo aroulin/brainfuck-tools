@@ -12,6 +12,8 @@ void BrainfuckVM::Interpret(std::vector<char> & program) {
     while(instr_pointer < program.size()) {
         Step(program[instr_pointer]);
     }
+
+    *output_stream << std::endl;
 }
 
 void BrainfuckVM::reset() {
@@ -57,7 +59,7 @@ void BrainfuckVM::Step(char cmd) {
             break;
         case ']':
             if(memory[data_pointer] != 0) {
-                // Jump after corresponding ']'
+                // Jump after corresponding '['
                 unsigned remaining = 1;
                 do {
                     instr_pointer--;
