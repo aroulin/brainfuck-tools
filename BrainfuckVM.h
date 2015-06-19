@@ -4,6 +4,7 @@
 #include <array>
 #include <memory>
 #include <vector>
+#include <iostream>
 
 #define BRAINFUCK_MEM_SIZE 30000
 
@@ -13,10 +14,11 @@ public:
 
     void Interpret(std::vector<char> &program);
 
-    void Step(char cmd);
+    void Debug(std::vector<char> vector, std::istream& debug_stream=std::cin);
 
 private:
     std::vector<char> program;
+    std::vector<char> unstripped_program;
     unsigned instr_pointer;
     std::vector<char> memory;
     unsigned data_pointer;
@@ -26,6 +28,8 @@ private:
     std::ostream *output_stream;
 
     void reset();
+
+    void Step(unsigned nb_step=1, std::string prompt_input = "", std::string prompt_output = "");
 };
 
 
