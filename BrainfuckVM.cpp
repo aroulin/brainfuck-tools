@@ -1,6 +1,8 @@
 #include <iostream>
 #include <algorithm>
 #include <set>
+#include <string>
+#include <regex>
 #include "BrainfuckVM.h"
 #include "terminal_color.h"
 
@@ -120,8 +122,14 @@ void BrainfuckVM::Debug(std::vector<char> program, std::istream &debug_stream) {
             *output_stream << "R";
         }
 
-        if (debug_cmd == "S") {
-            Step(1, "", "O> ");
+        std::regex pattern_step(R"(S(\d+)?)");
+        std::smatch matches;
+
+        if (std::regex_search(debug_cmd, matches, pattern_step)) {
+            if(matches.size() > 1 && matches[1].matched)
+                Step(std::stoi(matches[1]), "", "O>");
+            else
+                Step(1, "", "O> ");
         } else if (debug_cmd == "R") {
             Step(STEP_UNTIL_END, "", "O>");
         } else if (debug_cmd == "L") {
