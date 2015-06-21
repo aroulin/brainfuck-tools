@@ -123,18 +123,51 @@ void BrainfuckVM::Debug(std::vector<char> program, std::istream &debug_stream) {
         }
 
         std::regex pattern_step(R"(S(\d+)?)");
+        std::regex pattern_go(R"(G(-)?(\d+))");
+        std::regex pattern_dump(R"(D(\d+)(-(\d+))?)");
         std::smatch matches;
 
         if (std::regex_search(debug_cmd, matches, pattern_step)) {
-            if(matches.size() > 1 && matches[1].matched)
+            if (matches.size() > 1 && matches[1].matched)
                 Step(std::stoi(matches[1]), "", "O>");
             else
                 Step(1, "", "O> ");
         } else if (debug_cmd == "R") {
             Step(STEP_UNTIL_END, "", "O>");
-        } else if (debug_cmd == "L") {
-            *output_stream << "IP: " << instr_pointer << std::endl << std::endl;
+        } else if (std::regex_search(debug_cmd, matches, pattern_go)) {
+            unsigned target_ip = 0;
+            if (matches.size() > 2 && matches[2].matched) {
+                target_ip = std::stoi(matches[2]);
 
+                if (matches[1].matched) {
+                    target_ip = this->program.size() - target_ip;
+                }
+
+                while (instr_pointer != target_ip && instr_pointer < this->program.size()) {
+                    Step(1, "", "O>");
+                }
+
+            }
+        } else if (std::regex_search(debug_cmd, matches, pattern_dump)) {
+            if (matches[1].matched) {
+
+                if (matches[2].matched && matches[3].matched) {
+                    // dump array between these positions
+                    unsigned start = std::stoi(matches[1]);
+                    unsigned end = std::stoi(matches[3]);
+                    for (auto i = start; i <= end; i++) {
+                        *output_stream << static_cast<unsigned>(static_cast<unsigned char>(memory.at(i))) << " ";
+                    }
+                    *output_stream << std::endl;
+                } else {
+                    // dump array at given position
+                    *output_stream <<
+                    static_cast<unsigned>(static_cast<unsigned char>(memory.at(std::stoi(matches[1])))) << std::endl;
+                }
+            }
+        } else if(debug_cmd == "P") {
+            *output_stream << "DP: " << data_pointer << std::endl;
+        } else if (debug_cmd == "L") {
             unsigned strip_program_index = 0;
             unsigned unstripped_program_index = 0;
 
@@ -160,6 +193,8 @@ void BrainfuckVM::Debug(std::vector<char> program, std::istream &debug_stream) {
             for (; unstripped_program_index < unstripped_program.size(); unstripped_program_index++) {
                 *output_stream << this->unstripped_program[unstripped_program_index];
             }
+
+            *output_stream << std::endl << "IP: " << instr_pointer << std::endl;
         }
     }
 
