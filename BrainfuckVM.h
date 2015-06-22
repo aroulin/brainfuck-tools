@@ -14,7 +14,9 @@ public:
 
     void Interpret(std::vector<char> &program);
 
-    void Debug(std::vector<char> vector, std::istream& debug_stream=std::cin);
+    void Debug(std::vector<char> vector, std::istream &debug_stream = std::cin);
+
+    static std::vector<char> ReadProgram(std::ifstream &bf_program_file);
 
 private:
     std::vector<char> program;
@@ -22,14 +24,13 @@ private:
     unsigned instr_pointer;
     std::vector<char> memory;
     unsigned data_pointer;
-    std::vector<unsigned> loop_stack;
 
     std::istream *input_stream;
     std::ostream *output_stream;
 
     void reset();
 
-    void Step(unsigned nb_step=1, std::string prompt_input = "", std::string prompt_output = "");
+    void Step(unsigned nb_step = 1);
 };
 
 
