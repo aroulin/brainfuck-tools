@@ -1,10 +1,8 @@
+#include <iostream>
 #include "BrainfuckVM.h"
 
 void BrainfuckVM::Interpret(const std::string program_to_interpret) {
-    instr_pointer = 0;
-
-    this->program = StripUnwantedCharacters(program_to_interpret);
-
+    Start(program_to_interpret);
     while (!ProgramIsFinished()) {
         SingleStep();
     }
@@ -27,7 +25,7 @@ std::string BrainfuckVM::StripUnwantedCharacters(const std::string &program) {
     return stripped_program;
 }
 
-void BrainfuckVM::Step(unsigned int num_steps) {
+void BrainfuckVM::Step(unsigned num_steps) {
     for (auto i = 0; i < num_steps; i++) {
         SingleStep();
     }
@@ -90,10 +88,15 @@ void BrainfuckVM::Reset() {
     std::fill(memory.begin(), memory.end(), 0);
 }
 
-void BrainfuckVM::GoUntil(int target_instr_pointer, bool offset_is_from_end) {
+void BrainfuckVM::GoUntil(unsigned target_instr_pointer, bool offset_is_from_end) {
     if (offset_is_from_end)
         target_instr_pointer = program.size() - target_instr_pointer;
     while (!ProgramIsFinished() && instr_pointer != target_instr_pointer) {
         SingleStep();
     }
+}
+
+std::string BrainfuckVM::GetFormattedLocation() {
+    return "IP:\t" + std::string(instr_pointer, ' ') + 'v' + std::string(program.size() - instr_pointer, ' ') +
+           "\nL1:\t" + program;
 }

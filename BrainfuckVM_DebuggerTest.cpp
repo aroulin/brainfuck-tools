@@ -49,9 +49,9 @@ TEST_F(BrainfuckVMDebugger, StartingDebuggerResetsInstrPointer) {
 
 TEST_F(BrainfuckVMDebugger, GoUntilGivenInstrPointer) {
     vm.Start("+-<>");
-    vm.GoUntil(2, false);
+    vm.GoUntil(2);
     EXPECT_THAT(vm.GetInstrPointer(), Eq(2));
-    vm.GoUntil(10, false);
+    vm.GoUntil(10);
     ASSERT_THAT(vm.GetInstrPointer(), Eq(4));
 }
 
@@ -61,4 +61,13 @@ TEST_F(BrainfuckVMDebugger, GoUntilGivenInstrPointerFromEndOfProgram) {
     EXPECT_THAT(vm.GetInstrPointer(), Eq(3));
     vm.GoUntil(0, true);
     ASSERT_THAT(vm.GetInstrPointer(), Eq(4));
+}
+
+TEST_F(BrainfuckVMDebugger, OutputsSingleLineProgramLocation) {
+    vm.Start("+-<>");
+    EXPECT_THAT(vm.GetFormattedLocation(), Eq("IP:\tv    \nL1:\t+-<>"));
+    vm.Step(2);
+    EXPECT_THAT(vm.GetFormattedLocation(), Eq("IP:\t  v  \nL1:\t+-<>"));
+    vm.GoUntil(0, true);
+    ASSERT_THAT(vm.GetFormattedLocation(), Eq("IP:\t    v\nL1:\t+-<>"));
 }
