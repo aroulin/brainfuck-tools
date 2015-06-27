@@ -8,7 +8,7 @@ static void AddEpilogue(std::vector<unsigned char> &code);
 
 static void Execute(std::vector<unsigned char> &code);
 
-static void AddInstruction(char instr, std::vector<unsigned char> &code);
+static void AddInstruction(char instr, std::vector<unsigned char> &code, std::vector<size_t>& brackets);
 
 /*
  * Register Assignment:
@@ -19,16 +19,17 @@ static void AddInstruction(char instr, std::vector<unsigned char> &code);
 
 void BrainfuckVM::JIT(std::string program) {
     std::vector<unsigned char> code;
+    std::vector<size_t> brackets;
     AddPrologue(code);
     for (auto instr: program) {
-        AddInstruction(instr, code);
+        AddInstruction(instr, code, brackets);
     }
     AddEpilogue(code);
 
     Execute(code);
 }
 
-static void AddInstruction(char instr, std::vector<unsigned char> &code) {
+static void AddInstruction(char instr, std::vector<unsigned char> &code, std::vector<size_t>& brackets) {
     switch (instr) {
         case '>':
             code.insert(code.end(), {
@@ -61,6 +62,30 @@ static void AddInstruction(char instr, std::vector<unsigned char> &code) {
                     0x41, 0xFF, 0xD5, // call %r13
                     0x88, 0x03        // mov (%rbx), %al
             });
+            break;
+        case '[':
+            code.insert(code.end(), {
+                    0x80, 0x3B, 0x00, // cmpb [%rbx], 0
+                    0x0F, 0x84, 0x00, 0x00, 0x00, 0x00 // je matching ]
+            });
+            brackets.push_back(code.size());
+            break;
+        case ']':
+            code.insert(code.end(), {
+                    0x80, 0x3B, 0x00, // cmpb [%rbx], 0
+                    0x0F, 0x85, 0x00, 0x00, 0x00, 0x00 // jne matching ]
+            });
+            size_t corresponding_offset = brackets.back();
+            size_t offset = code.size() - corresponding_offset;
+            brackets.pop_back();
+            code[corresponding_offset - 4] = (unsigned char) (offset & 0xFF);
+            code[corresponding_offset - 3] = (unsigned char) ((offset >> 8) & 0xFF);
+            code[corresponding_offset - 2] = (unsigned char) ((offset >> 16) & 0xFF);
+            code[corresponding_offset - 1] = (unsigned char) ((offset >> 24) & 0xFF);
+            code[code.size() - 4] = (unsigned char) (-offset & 0xFF);
+            code[code.size() - 3] = (unsigned char) ((-offset >> 8) & 0xFF);
+            code[code.size() - 2] = (unsigned char) ((-offset >> 16) & 0xFF);
+            code[code.size() - 1] = (unsigned char) ((-offset >> 24) & 0xFF);
             break;
     }
 }
@@ -102,7 +127,9 @@ static void Execute(std::vector<unsigned char> &code) {
 
     // allocate brainfuck memory array
     unsigned char *memory_array = new unsigned char[BrainfuckVM::memory_size];
+    memset(memory_array, 0, BrainfuckVM::memory_size);
 
     jit_code(putchar, getchar, memory_array);
     munmap(code_area, code.size());
+    delete[] memory_array;
 }

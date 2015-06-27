@@ -73,6 +73,13 @@ void BrainfuckVM::SingleStep() {
                     remainingOpenBrackets--;
             } while (remainingOpenBrackets > 0);
         }
+        break;
+        case '.':
+            std::cout << (char) memory[data_pointer];
+            break;
+        case ',':
+            std::cin >> memory[data_pointer];
+            break;
     }
 
     instr_pointer++;
