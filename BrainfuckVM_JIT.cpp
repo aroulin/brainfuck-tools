@@ -8,7 +8,9 @@ static void AddEpilogue(std::vector<unsigned char> &code);
 
 static void Execute(std::vector<unsigned char> &code);
 
-static void AddInstruction(char instr, std::vector<unsigned char> &code, std::vector<size_t>& brackets);
+static void AddInstruction(char instr, std::vector<unsigned char> &code, std::vector<size_t>&open_brackets_offsets_stack);
+
+static void WriteLittleEndian(std::vector<unsigned char> &code, size_t offset, size_t value);
 
 /*
  * Register Assignment:
@@ -19,17 +21,18 @@ static void AddInstruction(char instr, std::vector<unsigned char> &code, std::ve
 
 void BrainfuckVM::JIT(std::string program) {
     std::vector<unsigned char> code;
-    std::vector<size_t> brackets;
+    std::vector<size_t> open_brackets_offsets_stack;
+
     AddPrologue(code);
     for (auto instr: program) {
-        AddInstruction(instr, code, brackets);
+        AddInstruction(instr, code, open_brackets_offsets_stack);
     }
     AddEpilogue(code);
 
     Execute(code);
 }
 
-static void AddInstruction(char instr, std::vector<unsigned char> &code, std::vector<size_t>& brackets) {
+static void AddInstruction(char instr, std::vector<unsigned char> &code, std::vector<size_t>&open_brackets_offsets_stack) {
     switch (instr) {
         case '>':
             code.insert(code.end(), {
@@ -68,26 +71,29 @@ static void AddInstruction(char instr, std::vector<unsigned char> &code, std::ve
                     0x80, 0x3B, 0x00, // cmpb [%rbx], 0
                     0x0F, 0x84, 0x00, 0x00, 0x00, 0x00 // je matching ]
             });
-            brackets.push_back(code.size());
+            open_brackets_offsets_stack.push_back(code.size());
             break;
         case ']':
             code.insert(code.end(), {
                     0x80, 0x3B, 0x00, // cmpb [%rbx], 0
                     0x0F, 0x85, 0x00, 0x00, 0x00, 0x00 // jne matching ]
             });
-            size_t corresponding_offset = brackets.back();
-            size_t offset = code.size() - corresponding_offset;
-            brackets.pop_back();
-            code[corresponding_offset - 4] = (unsigned char) (offset & 0xFF);
-            code[corresponding_offset - 3] = (unsigned char) ((offset >> 8) & 0xFF);
-            code[corresponding_offset - 2] = (unsigned char) ((offset >> 16) & 0xFF);
-            code[corresponding_offset - 1] = (unsigned char) ((offset >> 24) & 0xFF);
-            code[code.size() - 4] = (unsigned char) (-offset & 0xFF);
-            code[code.size() - 3] = (unsigned char) ((-offset >> 8) & 0xFF);
-            code[code.size() - 2] = (unsigned char) ((-offset >> 16) & 0xFF);
-            code[code.size() - 1] = (unsigned char) ((-offset >> 24) & 0xFF);
+
+            size_t corresponding_open_bracket_offset = open_brackets_offsets_stack.back();
+            open_brackets_offsets_stack.pop_back();
+
+            size_t offset_btw_matching_brackets = code.size() - corresponding_open_bracket_offset;
+            WriteLittleEndian(code, corresponding_open_bracket_offset, offset_btw_matching_brackets);
+            WriteLittleEndian(code, code.size(), -offset_btw_matching_brackets);
             break;
     }
+}
+
+static void WriteLittleEndian(std::vector<unsigned char> &code, size_t offset, size_t value) {
+    code[offset - 4] = (unsigned char) (value & 0xFF);
+    code[offset - 3] = (unsigned char) ((value >> 8) & 0xFF);
+    code[offset - 2] = (unsigned char) ((value >> 16) & 0xFF);
+    code[offset - 1] = (unsigned char) ((value >> 24) & 0xFF);
 }
 
 static void AddPrologue(std::vector<unsigned char> &code) {
