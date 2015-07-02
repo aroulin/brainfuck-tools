@@ -8,7 +8,8 @@ static void AddEpilogue(std::vector<unsigned char> &code);
 
 static void Execute(std::vector<unsigned char> &code);
 
-static void AddInstruction(char instr, std::vector<unsigned char> &code, std::vector<size_t>&open_brackets_offsets_stack);
+static void AddInstruction(char instr, std::vector<unsigned char> &code,
+                           std::vector<size_t> &open_brackets_offsets_stack);
 
 static void WriteLittleEndian(std::vector<unsigned char> &code, size_t offset, size_t value);
 
@@ -32,7 +33,8 @@ void BrainfuckVM::JIT(std::string program) {
     Execute(code);
 }
 
-static void AddInstruction(char instr, std::vector<unsigned char> &code, std::vector<size_t>&open_brackets_offsets_stack) {
+static void AddInstruction(char instr, std::vector<unsigned char> &code,
+                           std::vector<size_t> &open_brackets_offsets_stack) {
     switch (instr) {
         case '>':
             code.insert(code.end(), {

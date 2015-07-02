@@ -29,7 +29,9 @@ public:
 
     static const size_t memory_size = 30000;
 
-    std::string GetFormattedLocation();
+    void PrintFormattedLocation();
+
+    bool ProgramIsFinished();
 
 private:
     unsigned instr_pointer = 0;
@@ -43,7 +45,7 @@ private:
 
     void SingleStep();
 
-    bool ProgramIsFinished();
+    std::string original_program;
 };
 
 #endif //BRAINFUCK_JIT_BRAINFUCKVM_H

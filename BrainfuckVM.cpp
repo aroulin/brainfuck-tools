@@ -10,6 +10,7 @@ void BrainfuckVM::Interpret(const std::string program_to_interpret) {
 
 void BrainfuckVM::Start(const std::string program_to_debug) {
     instr_pointer = 0;
+    this->original_program = program_to_debug;
     this->program = StripUnwantedCharacters(program_to_debug);
 }
 
@@ -73,7 +74,7 @@ void BrainfuckVM::SingleStep() {
                     remainingOpenBrackets--;
             } while (remainingOpenBrackets > 0);
         }
-        break;
+            break;
         case '.':
             std::cout << (char) memory[data_pointer];
             break;
@@ -103,7 +104,46 @@ void BrainfuckVM::GoUntil(unsigned target_instr_pointer, bool offset_is_from_end
     }
 }
 
-std::string BrainfuckVM::GetFormattedLocation() {
-    return "IP:\t" + std::string(instr_pointer, ' ') + 'v' + std::string(program.size() - instr_pointer, ' ') +
-           "\nL1:\t" + program;
+void BrainfuckVM::PrintFormattedLocation() {
+    unsigned original_ip = 0;
+    unsigned ip = 0;
+    unsigned line = 1;
+    unsigned line_start_offset = 0;
+    unsigned offset_in_line = 0;
+    do {
+        if (ip < instr_pointer) {
+            ip++;
+            offset_in_line++;
+            original_ip++;
+        }
+
+        while(NotBrainfuckCmd(original_program.at(original_ip))) {
+            if (original_program.at(original_ip) == '\n') {
+                line++;
+                line_start_offset = original_ip + 1;
+                offset_in_line = 0;
+            } else {
+                offset_in_line++;
+            }
+            original_ip++;
+        }
+    } while (ip < instr_pointer);
+
+    std::cout << "IP:\t";
+
+    for(auto i = line_start_offset; original_program[i] != '\n'; i++) {
+        if(i - line_start_offset == offset_in_line)
+            std::cout << "v";
+        else
+            std::cout << " ";
+    }
+
+    std::cout << std::endl;
+    std::cout << "L" << line << "\t";
+
+    for(auto i = line_start_offset; original_program[i] != '\n'; i++) {
+        std::cout << original_program[i];
+    }
+
+    std::cout << std::endl;
 }
