@@ -27,7 +27,7 @@ std::string BrainfuckVM::StripUnwantedCharacters(const std::string &program) {
 }
 
 void BrainfuckVM::Step(unsigned num_steps) {
-    for (auto i = 0; i < num_steps; i++) {
+    for (unsigned i = 0; i < num_steps; i++) {
         SingleStep();
     }
 }
@@ -139,7 +139,7 @@ void BrainfuckVM::PrintFormattedLocation() {
     }
 
     std::cout << std::endl;
-    std::cout << "L" << line << "\t";
+    std::cout << "L" << line << ":\t";
 
     for(auto i = line_start_offset; original_program[i] != '\n'; i++) {
         std::cout << original_program[i];
