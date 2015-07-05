@@ -79,7 +79,7 @@ void BrainfuckVM::SingleStep() {
             std::cout << (char) memory[data_pointer];
             break;
         case ',':
-            std::cin >> memory[data_pointer];
+            *inputs >> memory[data_pointer];
             break;
     }
 
@@ -117,7 +117,7 @@ void BrainfuckVM::PrintFormattedLocation() {
             original_ip++;
         }
 
-        while(NotBrainfuckCmd(original_program.at(original_ip))) {
+        while (NotBrainfuckCmd(original_program.at(original_ip))) {
             if (original_program.at(original_ip) == '\n') {
                 line++;
                 line_start_offset = original_ip + 1;
@@ -131,8 +131,8 @@ void BrainfuckVM::PrintFormattedLocation() {
 
     std::cout << "IP:\t";
 
-    for(auto i = line_start_offset; original_program[i] != '\n'; i++) {
-        if(i - line_start_offset == offset_in_line)
+    for (auto i = line_start_offset; original_program[i] != '\n'; i++) {
+        if (i - line_start_offset == offset_in_line)
             std::cout << "v";
         else
             std::cout << " ";
@@ -141,9 +141,13 @@ void BrainfuckVM::PrintFormattedLocation() {
     std::cout << std::endl;
     std::cout << "L" << line << ":\t";
 
-    for(auto i = line_start_offset; original_program[i] != '\n'; i++) {
+    for (auto i = line_start_offset; original_program[i] != '\n'; i++) {
         std::cout << original_program[i];
     }
 
     std::cout << std::endl;
+}
+
+BrainfuckVM::BrainfuckVM(std::istream *inputs) : inputs(inputs) {
+
 }

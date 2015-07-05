@@ -11,9 +11,6 @@ void UsageAndExit();
 void PrintVMState(BrainfuckVM &vm);
 
 int main(int argc, char **argv) {
-/*
-    testing::InitGoogleMock(&argc, argv);
-    return RUN_ALL_TESTS();*/
 
     if (argc != 3 && argc != 4) {
         UsageAndExit();
@@ -21,10 +18,11 @@ int main(int argc, char **argv) {
 
     std::ifstream program_file(argv[2]);
     if (!program_file) {
-        std::cout << "Unknown program file " << argv[1];
+        std::cout << "Unknown program file " << argv[2];
         exit(EXIT_FAILURE);
     }
 
+    // Read program
     std::string program;
     program_file.seekg(0, std::ios::end);
     program.resize(program_file.tellg());
@@ -32,13 +30,29 @@ int main(int argc, char **argv) {
     program_file.read(&program[0], program.size());
     program_file.close();
 
-    BrainfuckVM vm;
+
+    std::istream *inputs = &std::cin;
+    std::unique_ptr<std::ifstream> inputs_file = nullptr;
+    if (argc == 4) {
+        inputs_file.reset(new std::ifstream(argv[3]));
+        inputs = inputs_file.get();
+        if (!*inputs_file) {
+            std::cout << "Unknown inputs file " << argv[3];
+            exit(EXIT_FAILURE);
+        }
+    }
+
+    BrainfuckVM vm(inputs);
     std::string mode = argv[1];
     if (mode == "-i") {
         vm.Interpret(program);
     } else if (mode == "-d") {
         Debugger(vm, program);
     } else if (mode == "-j") {
+        if(argc == 4) {
+            std::cout << "Unfortunately, you cannot specify an inputs file while using JIT";
+            exit(EXIT_FAILURE);
+        }
         vm.JIT(program);
     } else {
         UsageAndExit();

@@ -2,12 +2,15 @@
 #define BRAINFUCK_JIT_BRAINFUCKVM_H
 
 #include <vector>
+#include <iostream>
 #include <string>
 #include <algorithm>
 #include <set>
 
 class BrainfuckVM {
 public:
+
+    BrainfuckVM(std::istream *inputs = &std::cin);
 
     void JIT(std::string program);
 
@@ -38,6 +41,7 @@ private:
     std::string program;
     unsigned data_pointer = 0;
     std::vector<char> memory = std::vector<char>(memory_size, 0);
+    std::istream *inputs;
 
     static bool NotBrainfuckCmd(char cmd);
 
