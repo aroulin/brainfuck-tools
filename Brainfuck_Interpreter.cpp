@@ -1,38 +1,40 @@
 #include <iostream>
-#include "BrainfuckVM.h"
+#include "Brainfuck.h"
 
-void BrainfuckVM::Interpret(const std::string program_to_interpret) {
+using namespace Brainfuck;
+
+void Interpreter::Interpret(const std::string program_to_interpret) {
     Start(program_to_interpret);
     while (!ProgramIsFinished()) {
         SingleStep();
     }
 }
 
-void BrainfuckVM::Start(const std::string program_to_debug) {
+void Interpreter::Start(const std::string program_to_debug) {
     instr_pointer = 0;
     this->original_program = program_to_debug;
     this->program = StripUnwantedCharacters(program_to_debug);
 }
 
-bool BrainfuckVM::NotBrainfuckCmd(char cmd) {
+bool Interpreter::NotBrainfuckCmd(char cmd) {
     std::set<char> valid_cmds{'>', '<', '+', '-', '.', ',', '[', ']'};
     return valid_cmds.find(cmd) == valid_cmds.end();
 }
 
-std::string BrainfuckVM::StripUnwantedCharacters(const std::string &program) {
+std::string Interpreter::StripUnwantedCharacters(const std::string &program) {
     std::string stripped_program(program);
     stripped_program.erase(std::remove_if(stripped_program.begin(), stripped_program.end(), NotBrainfuckCmd),
                            stripped_program.end());
     return stripped_program;
 }
 
-void BrainfuckVM::Step(unsigned num_steps) {
+void Interpreter::Step(unsigned num_steps) {
     for (unsigned i = 0; i < num_steps; i++) {
         SingleStep();
     }
 }
 
-void BrainfuckVM::SingleStep() {
+void Interpreter::SingleStep() {
     if (ProgramIsFinished())
         return;
 
@@ -86,17 +88,17 @@ void BrainfuckVM::SingleStep() {
     instr_pointer++;
 }
 
-bool BrainfuckVM::ProgramIsFinished() {
+bool Interpreter::ProgramIsFinished() {
     return instr_pointer >= program.size();
 }
 
-void BrainfuckVM::Reset() {
+void Interpreter::Reset() {
     instr_pointer = 0;
     data_pointer = 0;
     std::fill(memory.begin(), memory.end(), 0);
 }
 
-void BrainfuckVM::GoUntil(unsigned target_instr_pointer, bool offset_is_from_end) {
+void Interpreter::GoUntil(unsigned target_instr_pointer, bool offset_is_from_end) {
     if (offset_is_from_end)
         target_instr_pointer = program.size() - target_instr_pointer;
     while (!ProgramIsFinished() && instr_pointer != target_instr_pointer) {
@@ -104,7 +106,7 @@ void BrainfuckVM::GoUntil(unsigned target_instr_pointer, bool offset_is_from_end
     }
 }
 
-void BrainfuckVM::PrintFormattedLocation() {
+void Interpreter::PrintFormattedLocation() {
     unsigned original_ip = 0;
     unsigned ip = 0;
     unsigned line = 1;
@@ -148,6 +150,6 @@ void BrainfuckVM::PrintFormattedLocation() {
     std::cout << std::endl;
 }
 
-BrainfuckVM::BrainfuckVM(std::istream *inputs) : inputs(inputs) {
+Interpreter::Interpreter(std::istream *inputs) : inputs(inputs) {
 
 }

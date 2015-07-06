@@ -29,3 +29,6 @@
 
 #CLion project files
 .idea/
+
+#CMake build directory
+build/

@@ -1,11 +1,11 @@
 #include "gmock/gmock.h"
-#include "BrainfuckVM.h"
+#include "Brainfuck.h"
 
 using namespace testing;
 
 class BrainfuckVMImpl : public Test {
 public:
-    BrainfuckVM vm;
+    Brainfuck::Interpreter vm;
 };
 
 TEST_F(BrainfuckVMImpl, ConstructedWithInstrPointerZero) {

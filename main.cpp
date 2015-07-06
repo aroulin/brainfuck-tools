@@ -2,13 +2,13 @@
 #include <iostream>
 #include <regex>
 #include "gmock/gmock.h"
-#include "BrainfuckVM.h"
+#include "Brainfuck.h"
 
-void Debugger(BrainfuckVM &vm, std::string program);
+void Debugger(Brainfuck::Interpreter &vm, std::string program);
 
 void UsageAndExit();
 
-void PrintVMState(BrainfuckVM &vm);
+void PrintVMState(Brainfuck::Interpreter &vm);
 
 int main(int argc, char **argv) {
 
@@ -42,7 +42,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    BrainfuckVM vm(inputs);
+    Brainfuck::Interpreter vm(inputs);
     std::string mode = argv[1];
     if (mode == "-i") {
         vm.Interpret(program);
@@ -53,7 +53,7 @@ int main(int argc, char **argv) {
             std::cout << "Unfortunately, you cannot specify an inputs file while using JIT";
             exit(EXIT_FAILURE);
         }
-        vm.JIT(program);
+        Brainfuck::JIT(program);
     } else {
         UsageAndExit();
     }
@@ -61,11 +61,11 @@ int main(int argc, char **argv) {
 
 void UsageAndExit() {
     std::cout << "USAGE:" << std::endl
-    << "BrainfuckVM { -i | -d | -j } program.bf [inputs.txt]" << std::endl;
+    << "Interpreter { -i | -d | -j } program.bf [inputs.txt]" << std::endl;
     exit(EXIT_SUCCESS);
 }
 
-void Debugger(BrainfuckVM &vm, std::string program) {
+void Debugger(Brainfuck::Interpreter &vm, std::string program) {
     std::cout << "Brainfuck Debugger" << std::endl <<
     "'exit' to exit" << std::endl << std::endl;
 
@@ -127,32 +127,30 @@ void Debugger(BrainfuckVM &vm, std::string program) {
     }
 }
 
-void PrintVMState(BrainfuckVM &vm) {
+void PrintVMState(Brainfuck::Interpreter &vm) {
     std::cout << "IP = " << vm.GetInstrPointer() << "\t";
     std::cout << "DP = " << vm.GetDataPointer() << std::endl;
     vm.PrintFormattedLocation();
     std::vector<char> mem = vm.GetMemory();
     mem.resize(10);
 
-    std::cout << "DP: \t  ";
-    for (auto i = 0; i < 10; i++) {
-        if (i == vm.GetDataPointer()) {
-            std::cout << "v  ";
-        } else {
-            std::cout << "   ";
-        }
+    std::string mem_output  = "";
+    long cursor_pos = -1;
+    for (int i = 0; i < mem.size(); i++) {
+        if(i == vm.GetDataPointer())
+            cursor_pos = mem_output.size();
+        mem_output +=std::to_string((int) mem[i]) + ", ";
     }
 
-    if (vm.GetDataPointer() >= 10) {
-        std::cout << " v";
+    mem_output += "...";
+    if(cursor_pos == -1)
+        cursor_pos = mem_output.size() - 1;
+
+    std::cout << "DP: \t ";
+    for (auto i = 0; i < cursor_pos; i++) {
+        std::cout << " ";
     }
+    std::cout << "v" << std::endl;
+    std::cout << "MEM:\t[" << mem_output << "]" << std::endl << std::endl;
 
-    std::cout << std::endl;
-
-    std::cout << "MEM:\t[ ";
-    for (int i: mem) {
-        std::cout << i << ", ";
-    }
-
-    std::cout << "...]" << std::endl << std::endl;
 }

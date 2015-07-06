@@ -1,6 +1,8 @@
-#include "BrainfuckVM.h"
+#include "Brainfuck.h"
 #include <sys/mman.h>
 #include <string.h>
+
+using namespace Brainfuck;
 
 static void AddPrologue(std::vector<unsigned char> &code);
 
@@ -20,7 +22,7 @@ static void WriteLittleEndian(std::vector<unsigned char> &code, size_t offset, s
  * r13: getchar
  */
 
-void BrainfuckVM::JIT(std::string program) {
+void Brainfuck::JIT(std::string program) {
     std::vector<unsigned char> code;
     std::vector<size_t> open_brackets_offsets_stack;
 
@@ -134,8 +136,8 @@ static void Execute(std::vector<unsigned char> &code) {
                                                                               unsigned char *)) code_area;
 
     // allocate brainfuck memory array
-    unsigned char *memory_array = new unsigned char[BrainfuckVM::memory_size];
-    memset(memory_array, 0, BrainfuckVM::memory_size);
+    unsigned char *memory_array = new unsigned char[Interpreter::memory_size];
+    memset(memory_array, 0, Interpreter::memory_size);
 
     jit_code(putchar, getchar, memory_array);
     munmap(code_area, code.size());
