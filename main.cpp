@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
     } else if (mode == "-d") {
         Debugger(vm, program);
     } else if (mode == "-j") {
-        if(argc == 4) {
+        if (argc == 4) {
             std::cout << "Unfortunately, you cannot specify an inputs file while using JIT";
             exit(EXIT_FAILURE);
         }
@@ -131,12 +131,28 @@ void PrintVMState(BrainfuckVM &vm) {
     std::cout << "IP = " << vm.GetInstrPointer() << "\t";
     std::cout << "DP = " << vm.GetDataPointer() << std::endl;
     vm.PrintFormattedLocation();
-    std::cout << "MEM:\t[";
     std::vector<char> mem = vm.GetMemory();
     mem.resize(10);
+
+    std::cout << "DP: \t  ";
+    for (auto i = 0; i < 10; i++) {
+        if (i == vm.GetDataPointer()) {
+            std::cout << "v  ";
+        } else {
+            std::cout << "   ";
+        }
+    }
+
+    if (vm.GetDataPointer() >= 10) {
+        std::cout << " v";
+    }
+
+    std::cout << std::endl;
+
+    std::cout << "MEM:\t[ ";
     for (int i: mem) {
         std::cout << i << ", ";
     }
 
-    std::cout << "...]" << std::endl;
+    std::cout << "...]" << std::endl << std::endl;
 }

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.11)
 project(brainfuck_jit)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -g -O0")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -g -O0 -Wno-sign-compare")
 
 include_directories($ENV{GMOCK_HOME}/include $ENV{GMOCK_HOME}/gtest/include)
 link_directories($ENV{GMOCK_HOME}/mybuild $ENV{GMOCK_HOME}/gtest/mybuild)
