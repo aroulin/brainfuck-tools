@@ -45,7 +45,7 @@ static void AddInstruction(char instr, std::vector<unsigned char> &code,
             break;
         case '<':
             code.insert(code.end(), {
-                    0x48, 0xFF, 0xCB // inc %rbx
+                    0x48, 0xFF, 0xCB // dec %rbx
             });
             break;
         case '+':

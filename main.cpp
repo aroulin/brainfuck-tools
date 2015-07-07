@@ -50,10 +50,16 @@ int main(int argc, char **argv) {
         Debugger(vm, program);
     } else if (mode == "-j") {
         if (argc == 4) {
-            std::cout << "Unfortunately, you cannot specify an inputs file while using JIT";
+            std::cout << "Unfortunately, you cannot specify an inputs file while using the JIT";
             exit(EXIT_FAILURE);
         }
         Brainfuck::JIT(program);
+    } else if(mode == "-c") {
+        if (argc == 4) {
+            std::cout << "Unfortunately, you cannot specify an inputs file while using the compiler";
+            exit(EXIT_FAILURE);
+        }
+        Brainfuck::Compile(program);
     } else {
         UsageAndExit();
     }

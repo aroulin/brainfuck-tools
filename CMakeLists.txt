@@ -3,7 +3,7 @@ project(brainfuck_jit)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wall -g -O0 -Wno-sign-compare")
 
-set(SOURCE_FILES Brainfuck.h Brainfuck_Interpreter.cpp Brainfuck_JIT.cpp)
+set(SOURCE_FILES Brainfuck.h Brainfuck_Interpreter.cpp Brainfuck_JIT.cpp Brainfuck_Compiler.cpp)
 add_executable(Brainfuck main.cpp ${SOURCE_FILES})
 
 if (DEFINED ENV{GMOCK_HOME})

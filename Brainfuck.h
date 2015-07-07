@@ -9,6 +9,7 @@
 
 namespace Brainfuck {
     void JIT(std::string program);
+    void Compile(std::string program);
 
     class Interpreter {
     public:
