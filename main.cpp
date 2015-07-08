@@ -50,13 +50,14 @@ int main(int argc, char **argv) {
         Debugger(vm, program);
     } else if (mode == "-j") {
         if (argc == 4) {
-            std::cout << "Unfortunately, you cannot specify an inputs file while using the JIT";
+            std::cout << "Unfortunately, you cannot specify a file for the inputs while using the JIT" << std::endl;
             exit(EXIT_FAILURE);
         }
         Brainfuck::JIT(program);
-    } else if(mode == "-c") {
+    } else if (mode == "-c") {
         if (argc == 4) {
-            std::cout << "Unfortunately, you cannot specify an inputs file while using the compiler";
+            std::cout << "Unfortunately, you cannot specify a file for the inputs while using the compiler" <<
+            std::endl;
             exit(EXIT_FAILURE);
         }
         Brainfuck::Compile(program);
@@ -140,16 +141,16 @@ void PrintVMState(Brainfuck::Interpreter &vm) {
     std::vector<char> mem = vm.GetMemory();
     mem.resize(10);
 
-    std::string mem_output  = "";
+    std::string mem_output = "";
     long cursor_pos = -1;
     for (int i = 0; i < mem.size(); i++) {
-        if(i == vm.GetDataPointer())
+        if (i == vm.GetDataPointer())
             cursor_pos = mem_output.size();
-        mem_output +=std::to_string((int) mem[i]) + ", ";
+        mem_output += std::to_string((int) mem[i]) + ", ";
     }
 
     mem_output += "...";
-    if(cursor_pos == -1)
+    if (cursor_pos == -1)
         cursor_pos = mem_output.size() - 1;
 
     std::cout << "DP: \t ";

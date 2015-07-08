@@ -1,2 +1,86 @@
-# brainfuck-jit
-A brainfuck interpreter, JIT &amp; debugger
+# brainfuck-tools
+Brainfuck Compiler, JIT, Interpreter and Debugger
+
+## Building
+
+      mkdir build && cd build
+      cmake ..
+      make
+
+## How to use it
+
+      ./Brainfuck {-i | -c | -j | -d} program.bf [inputs.txt]
+
+  ```-i``` for the Interpreter
+
+  ```-c``` for the Compiler
+
+  ```-j``` for the JIT
+
+  ```-d``` for the Debugger
+
+  ```program.bf``` must be a text file containing the Brainfuck program to execute/compile
+
+  ```inputs.txt``` is an optional file containing inputs instead of using stdin (useful for debugging, see Notes below)
+
+## Interpreter
+
+      ./Brainfuck -i program.bf
+
+Simple interpretation of the program (much slower than Compiler and JIT)
+
+## Compiler
+
+      ./Brainfuck -c program.bf > compiled_brainfuck.s
+      gcc compiled_brainfuck.s -o executable_brainfuck
+      ./executable_brainfuck
+
+Compiles the program for x86_64 (amd64) Linux following System V ABI.
+
+## JIT
+
+    ./Brainfuck -j program.bf
+
+Just-In-Time compilation and direct execution for x86_64 (amd64) Linux following System V ABI
+
+## Debugger
+
+    ./Brainfuck -d program.bf
+
+Debug the program using the following commands:
+
+    s<x>:     executes x brainfuck instructions (if x is not specified then x = 1)
+    g<x>:     executes instructions until instruction pointer = x (if x is negative, then until x instructions from end)
+    r:        run until end of the program
+    d<x>-<y>: dump memory content between address x and y (y is optional to print the content of one cell only)
+
+
+## Example debugging:
+
+Brainfuck program to execute ```2+3``` (Non-Brainfuck characters are comments)
+
+    +++    sets first operand to 3
+    >++<   sets second operand to 2
+    [->+<] add first op (3) to second (2) (yield 5)
+
+Sample debugging trace
+
+    ./Brainfuck -d ../samples/add.bf
+    Brainfuck Debugger
+    'exit' to exit
+
+    IP = 0	DP = 0
+    IP:	  v
+    L1:	  +++    sets first operand to 3
+    DP:   v
+    MEM: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ...]
+
+    > g10
+    IP = 10	DP = 1
+    IP:	     v
+    L3:	  [->+<] add first op (3) to second (2) (yield 5)
+    DP: 	  v
+    MEM:  [2, 2, 0, 0, 0, 0, 0, 0, 0, 0, ...]
+
+
+
