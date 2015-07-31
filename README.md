@@ -115,9 +115,9 @@ Using samples/mandelbrot.bf program which prints the mandelbrot set
 | Method        | Time      |
 | ------------- |----------:|
 | Interpreter   | 78.40s    |
-| Compiler      | 3.83s     |
-| Opt. Compiler | 1.64s     |
-| JIT           | 4.02s     |
-| Opt. JIT      | 1.82s     |
+| Compiler      | 3.66s     |
+| JIT           | 3.59s     |
+| Opt. JIT      | 1.36s     |
+| Opt. Compiler | 1.23s     |
 
 ![alt text](https://github.com/aroulin/brainfuck-tools/blob/master/plot.png "Results graph")
