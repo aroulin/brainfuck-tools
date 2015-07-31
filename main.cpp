@@ -68,7 +68,7 @@ int main(int argc, char **argv) {
 
 void UsageAndExit() {
     std::cout << "USAGE:" << std::endl
-    << "Interpreter { -i | -d | -j } program.bf [inputs.txt]" << std::endl;
+                             << "Interpreter { -i | -c | -j | -d } program.bf [inputs.txt]" << std::endl;
     exit(EXIT_SUCCESS);
 }
 
