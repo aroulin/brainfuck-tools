@@ -74,13 +74,31 @@ Sample debugging trace
     L1:	  +++    sets first operand to 3
     DP:   v
     MEM: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ...]
+    
+    > s2
+    IP = 2	DP = 0
+    IP:	  v                        
+    L1:	+++ sets first operand to 3
+    DP: 	 v
+    MEM:	[2, 0, 0, 0, 0, 0, 0, 0, 0, 0, ...]
 
-    > g10
-    IP = 10	DP = 1
-    IP:	     v
-    L3:	  [->+<] add first op (3) to second (2) (yield 5)
-    DP: 	  v
-    MEM:  [2, 2, 0, 0, 0, 0, 0, 0, 0, 0, ...]
+    > g11
+    IP = 11	DP = 1
+    IP:	    v                                          
+    L3:	[->+<] add first op (3) to second (2) (yield 5)
+    DP: 	    v
+    MEM:	[2, 3, 0, 0, 0, 0, 0, 0, 0, 0, ...]
+    
+    
+## Benchmarks
+
+Using samples/mandelbrot.bf program which prints the mandelbrot set
+
+| Method        | Time      |
+| ------------- |----------:|
+| Interpreter   | 343.89s   |
+| Compiler      | 3.62s     |
+| JIT           | 3.65s     |
 
 
 
