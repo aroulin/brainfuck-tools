@@ -9,15 +9,17 @@ Brainfuck Compiler, JIT, Interpreter and Debugger
 
 ## How to use it
 
-      ./Brainfuck {-i | -c | -j | -d} program.bf [inputs.txt]
+      ./Brainfuck {-i | -d | -c | -j | -jo} program.bf [inputs.txt]
 
   ```-i``` for the Interpreter
+  
+  ```-d``` for the Debugger
 
   ```-c``` for the Compiler
 
   ```-j``` for the JIT
-
-  ```-d``` for the Debugger
+  
+  ```-jo``` for optimised JIT
 
   ```program.bf``` must be a text file containing the Brainfuck program to execute/compile
 
@@ -99,6 +101,7 @@ Using samples/mandelbrot.bf program which prints the mandelbrot set
 | Interpreter   | 343.89s   |
 | Compiler      | 3.62s     |
 | JIT           | 3.65s     |
+| JIT Optimised | 1.79s     |
 
 
 

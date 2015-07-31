@@ -11,7 +11,9 @@ static void AddEpilogue(std::vector<unsigned char> &code);
 static void Execute(std::vector<unsigned char> &code);
 
 static void AddInstruction(char instr, std::vector<unsigned char> &code,
-                           std::vector<size_t> &open_brackets_offsets_stack);
+                           std::vector<size_t> &open_brackets_offsets_stack, size_t optimised_count = 1);
+
+bool CanBeOptimised(char instr);
 
 static void WriteLittleEndian(std::vector<unsigned char> &code, size_t offset, size_t value);
 
@@ -27,36 +29,60 @@ void Brainfuck::JIT(std::string program, bool optimised) {
     std::vector<size_t> open_brackets_offsets_stack;
 
     AddPrologue(code);
+
+    size_t optimised_count = 0;
+    char last_optimised_instr = 0;
     for (auto instr: program) {
-        AddInstruction(instr, code, open_brackets_offsets_stack);
+        if (optimised && instr == last_optimised_instr && CanBeOptimised(instr)) {
+            optimised_count++;
+        } else {
+            if (optimised_count > 0)
+                AddInstruction(last_optimised_instr, code, open_brackets_offsets_stack, optimised_count);
+            if (CanBeOptimised(instr)) {
+                last_optimised_instr = instr;
+                optimised_count = 1;
+            } else {
+                AddInstruction(instr, code, open_brackets_offsets_stack);
+                optimised_count = 0;
+            }
+        }
     }
+
     AddEpilogue(code);
 
     Execute(code);
 }
 
+bool CanBeOptimised(char instr) {
+    return instr == '+' || instr == '-' || instr == '<' || instr == '>';
+}
+
 static void AddInstruction(char instr, std::vector<unsigned char> &code,
-                           std::vector<size_t> &open_brackets_offsets_stack) {
+                           std::vector<size_t> &open_brackets_offsets_stack, size_t optimised_count) {
     switch (instr) {
         case '>':
             code.insert(code.end(), {
-                    0x48, 0xFF, 0xC3 // inc %rbx
+                    0x48, 0x81, 0xC3, 0x00, 0x00, 0x00, 0x00 // add rbx, optimised_count
             });
+            WriteLittleEndian(code, code.size(), optimised_count);
             break;
         case '<':
             code.insert(code.end(), {
-                    0x48, 0xFF, 0xCB // dec %rbx
+                    0x48, 0x81, 0xEB, 0x00, 0x00, 0x00, 0x00 // sub rbx, optimised_count
             });
+            WriteLittleEndian(code, code.size(), optimised_count);
             break;
         case '+':
             code.insert(code.end(), {
-                    0xFE, 0x03 // incb (%rbx)
+                    0x48, 0x81, 0x03, 0x00, 0x00, 0x00, 0x00  // addq [rbx], optimised_count
             });
+            WriteLittleEndian(code, code.size(), optimised_count);
             break;
         case '-':
             code.insert(code.end(), {
-                    0xFE, 0x0B // decb (%rbx)
+                    0x48, 0x81, 0x2B, 0x00, 0x00, 0x00, 0x00 // subq [rbx], optimised_count
             });
+            WriteLittleEndian(code, code.size(), optimised_count);
             break;
         case '.':
             code.insert(code.end(), {
