@@ -93,6 +93,20 @@ Sample debugging trace
     DP: 	    v
     MEM:	[2, 3, 0, 0, 0, 0, 0, 0, 0, 0, ...]
     
+
+## Optimized Compiler & JIT
+
+Using ```-co``` or ```-jo``` will result in optimized code that merge repeated Brainfuck instructions together.
+
+For example, the sequence ```+ + +``` compiled/jitted without optimizations will result in the following x86 instructions:
+
+    add $1, (%rbx)
+    add $1, (%rbx)
+    add $1, (%rbx)
+
+On the other hand, using the optimized compiler/JIT will result in a single instruction:
+
+    add $3, (%rbx)
     
 ## Benchmarks
 
