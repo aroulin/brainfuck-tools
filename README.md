@@ -17,11 +17,11 @@ Brainfuck Compiler, JIT, Interpreter and Debugger
 
   ```-c``` for the Compiler
   
-  ```-co``` for the optimised Compiler
+  ```-co``` for the optimized Compiler
 
   ```-j``` for the JIT
   
-  ```-jo``` for the optimised JIT
+  ```-jo``` for the optimized JIT
 
   ```program.bf``` must be a text file containing the Brainfuck program to execute/compile
 
@@ -46,6 +46,20 @@ Compiles the program for x86_64 (amd64) Linux following System V ABI.
     ./Brainfuck -j program.bf
 
 Just-In-Time compilation and direct execution for x86_64 (amd64) Linux following System V ABI
+
+## Optimized Compiler & JIT
+
+Using ```-co``` or ```-jo``` will result in optimized code that merge repeated Brainfuck instructions together.
+
+For example, the sequence ```+ + +``` compiled/jitted without optimizations will result in the following x86 instructions:
+
+    add $1, (%rbx)
+    add $1, (%rbx)
+    add $1, (%rbx)
+
+On the other hand, using the optimized compiler/JIT will result in a single instruction:
+
+    add $3, (%rbx)
 
 ## Debugger
 
@@ -93,20 +107,6 @@ Sample debugging trace
     DP: 	    v
     MEM:	[2, 3, 0, 0, 0, 0, 0, 0, 0, 0, ...]
     
-
-## Optimized Compiler & JIT
-
-Using ```-co``` or ```-jo``` will result in optimized code that merge repeated Brainfuck instructions together.
-
-For example, the sequence ```+ + +``` compiled/jitted without optimizations will result in the following x86 instructions:
-
-    add $1, (%rbx)
-    add $1, (%rbx)
-    add $1, (%rbx)
-
-On the other hand, using the optimized compiler/JIT will result in a single instruction:
-
-    add $3, (%rbx)
     
 ## Benchmarks
 
