@@ -120,5 +120,4 @@ Using samples/mandelbrot.bf program which prints the mandelbrot set
 | JIT           | 4.02s     |
 | Opt. JIT      | 1.82s     |
 
-
-
+![alt text](https://github.com/aroulin/brainfuck-tools/blob/master/plot.png "Results graph")
