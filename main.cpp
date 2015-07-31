@@ -147,7 +147,7 @@ void PrintVMState(Brainfuck::Interpreter &vm) {
 
     std::string mem_output = "";
     long cursor_pos = -1;
-    for (int i = 0; i < mem.size(); i++) {
+    for (unsigned i = 0; i < mem.size(); i++) {
         if (i == vm.GetDataPointer())
             cursor_pos = mem_output.size();
         mem_output += std::to_string((int) mem[i]) + ", ";

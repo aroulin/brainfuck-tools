@@ -9,11 +9,11 @@ public:
 };
 
 TEST_F(BrainfuckVMImpl, ConstructedWithInstrPointerZero) {
-    ASSERT_THAT(vm.GetInstrPointer(), Eq(0));
+    ASSERT_THAT(vm.GetInstrPointer(), Eq(0u));
 }
 
 TEST_F(BrainfuckVMImpl, ConstructedWithDataPointerZero) {
-    ASSERT_THAT(vm.GetDataPointer(), Eq(0));
+    ASSERT_THAT(vm.GetDataPointer(), Eq(0u));
 }
 
 TEST_F(BrainfuckVMImpl, ConstructedWithMemoryInitializedToZeroes) {
@@ -25,12 +25,12 @@ TEST_F(BrainfuckVMImpl, ConstructedWithMemoryInitializedToZeroes) {
 
 TEST_F(BrainfuckVMImpl, IncrementsDataPointerOnCommand) {
     vm.Interpret(">>>");
-    ASSERT_THAT(vm.GetDataPointer(), Eq(3));
+    ASSERT_THAT(vm.GetDataPointer(), Eq(3u));
 }
 
 TEST_F(BrainfuckVMImpl, DecrementsDataPointerOnCommand) {
     vm.Interpret(">>><<");
-    ASSERT_THAT(vm.GetDataPointer(), Eq(1));
+    ASSERT_THAT(vm.GetDataPointer(), Eq(1u));
 }
 
 TEST_F(BrainfuckVMImpl, IncrementsMemoryOnCommand) {
@@ -53,35 +53,35 @@ TEST_F(BrainfuckVMImpl, AddingTwoValuesWithJumps) {
 
 TEST_F(BrainfuckVMImpl, DoesNotResetAfterRunning) {
     vm.Interpret(">+");
-    EXPECT_THAT(vm.GetInstrPointer(), Eq(2));
-    EXPECT_THAT(vm.GetDataPointer(), Eq(1));
+    EXPECT_THAT(vm.GetInstrPointer(), Eq(2u));
+    EXPECT_THAT(vm.GetDataPointer(), Eq(1u));
     ASSERT_THAT(vm.GetMemory().at(1), Eq(1));
 }
 
 TEST_F(BrainfuckVMImpl, ResetsOnlyInstrPointerWhenStarting) {
     vm.Interpret(">+");
     vm.Interpret(">>>");
-    ASSERT_THAT(vm.GetInstrPointer(), Eq(3));
-    ASSERT_THAT(vm.GetDataPointer(), Eq(4));
+    ASSERT_THAT(vm.GetInstrPointer(), Eq(3u));
+    ASSERT_THAT(vm.GetDataPointer(), Eq(4u));
     ASSERT_THAT(vm.GetMemory().at(1), Eq(1));
 }
 
 TEST_F(BrainfuckVMImpl, IgnoresNonCommandCharacters) {
     vm.Interpret(">>#Hj>");
-    ASSERT_THAT(vm.GetInstrPointer(), Eq(3));
-    ASSERT_THAT(vm.GetDataPointer(), Eq(3));
+    ASSERT_THAT(vm.GetInstrPointer(), Eq(3u));
+    ASSERT_THAT(vm.GetDataPointer(), Eq(3u));
 }
 
 TEST_F(BrainfuckVMImpl, DontCrashOnEmptyProgram) {
     vm.Interpret("");
-    ASSERT_THAT(vm.GetInstrPointer(), Eq(0));
+    ASSERT_THAT(vm.GetInstrPointer(), Eq(0u));
 }
 
 TEST_F(BrainfuckVMImpl, CanResetState) {
     vm.Interpret("+>+");
     vm.Reset();
-    EXPECT_THAT(vm.GetInstrPointer(), Eq(0));
-    EXPECT_THAT(vm.GetDataPointer(), Eq(0));
+    EXPECT_THAT(vm.GetInstrPointer(), Eq(0u));
+    EXPECT_THAT(vm.GetDataPointer(), Eq(0u));
     EXPECT_THAT(vm.GetMemory().at(0), Eq(0));
     EXPECT_THAT(vm.GetMemory().at(1), Eq(0));
 }
