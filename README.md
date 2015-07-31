@@ -114,11 +114,11 @@ Using samples/mandelbrot.bf program which prints the mandelbrot set
 
 | Method        | Time      |
 | ------------- |----------:|
-| Interpreter   | 343.89s   |
-| Compiler      | 3.62s     |
+| Interpreter   | 78.40s    |
+| Compiler      | 3.83s     |
 | Opt. Compiler | 1.64s     |
-| JIT           | 3.65s     |
-| Opt. JIT      | 1.79s     |
+| JIT           | 4.02s     |
+| Opt. JIT      | 1.82s     |
 
 
 
