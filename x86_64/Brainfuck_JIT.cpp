@@ -61,15 +61,13 @@ static void AddInstructions(std::string program, std::vector<unsigned char> &cod
                 break;
             case '+':
                 code.insert(code.end(), {
-                        0x48, 0x81, 0x03, 0x00, 0x00, 0x00, 0x00  // addq [rbx], optimised_count
+                        0x80, 0x03, (unsigned char) optimised_count // addb [rbx] optimised_count
                 });
-                WriteLittleEndian(code, code.size(), optimised_count);
                 break;
             case '-':
                 code.insert(code.end(), {
-                        0x48, 0x81, 0x2B, 0x00, 0x00, 0x00, 0x00 // subq [rbx], optimised_count
+                        0x80, 0x2B, (unsigned char) optimised_count // subb [rbx], optimised_count
                 });
-                WriteLittleEndian(code, code.size(), optimised_count);
                 break;
             case '.':
                 code.insert(code.end(), {

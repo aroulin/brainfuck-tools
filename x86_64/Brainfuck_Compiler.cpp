@@ -49,10 +49,10 @@ static void AddInstructions(std::string program, bool optimised) {
                 std::cout << "sub $" << optimised_count << ", %rbx" << std::endl;
                 break;
             case '+':
-                std::cout << "add $" << optimised_count << ", (%rbx)" << std::endl;
+                std::cout << "addb $" << optimised_count << ", (%rbx)" << std::endl;
                 break;
             case '-':
-                std::cout << "sub $" << optimised_count << ", (%rbx)" << std::endl;
+                std::cout << "subb $" << optimised_count << ", (%rbx)" << std::endl;
                 break;
             case '.':
                 std::cout << "movzxb (%rbx), %rdi" << std::endl
