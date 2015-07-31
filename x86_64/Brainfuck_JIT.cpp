@@ -10,10 +10,7 @@ static void AddEpilogue(std::vector<unsigned char> &code);
 
 static void Execute(std::vector<unsigned char> &code);
 
-static void AddInstruction(char instr, std::vector<unsigned char> &code,
-                           std::vector<size_t> &open_brackets_offsets_stack, size_t optimised_count = 1);
-
-static bool CanBeOptimised(char instr);
+static void AddInstructions(std::string program, std::vector<unsigned char> &code, bool optimised);
 
 static void WriteLittleEndian(std::vector<unsigned char> &code, size_t offset, long value);
 
@@ -26,99 +23,90 @@ static void WriteLittleEndian(std::vector<unsigned char> &code, size_t offset, l
 
 void Brainfuck::JIT(std::string program, bool optimised) {
     std::vector<unsigned char> code;
-    std::vector<size_t> open_brackets_offsets_stack;
-
     AddPrologue(code);
-
-    size_t optimised_count = 0;
-    char last_optimised_instr = 0;
-    for (auto instr: program) {
-        if (optimised && instr == last_optimised_instr && CanBeOptimised(instr)) {
-            optimised_count++;
-        } else {
-            if (optimised_count > 0)
-                AddInstruction(last_optimised_instr, code, open_brackets_offsets_stack, optimised_count);
-            if (CanBeOptimised(instr)) {
-                last_optimised_instr = instr;
-                optimised_count = 1;
-            } else {
-                AddInstruction(instr, code, open_brackets_offsets_stack);
-                optimised_count = 0;
-            }
-        }
-    }
-
+    AddInstructions(program, code, optimised);
     AddEpilogue(code);
-
     Execute(code);
 }
 
-static bool CanBeOptimised(char instr) {
-    return instr == '+' || instr == '-' || instr == '<' || instr == '>';
+static bool IsOptimisableInstr(char instr) {
+    return instr == '+' || instr == '-' || instr == '>' || instr == '<';
 }
 
-static void AddInstruction(char instr, std::vector<unsigned char> &code,
-                           std::vector<size_t> &open_brackets_offsets_stack, size_t optimised_count) {
-    switch (instr) {
-        case '>':
-            code.insert(code.end(), {
-                    0x48, 0x81, 0xC3, 0x00, 0x00, 0x00, 0x00 // add rbx, optimised_count
-            });
-            WriteLittleEndian(code, code.size(), optimised_count);
-            break;
-        case '<':
-            code.insert(code.end(), {
-                    0x48, 0x81, 0xEB, 0x00, 0x00, 0x00, 0x00 // sub rbx, optimised_count
-            });
-            WriteLittleEndian(code, code.size(), optimised_count);
-            break;
-        case '+':
-            code.insert(code.end(), {
-                    0x48, 0x81, 0x03, 0x00, 0x00, 0x00, 0x00  // addq [rbx], optimised_count
-            });
-            WriteLittleEndian(code, code.size(), optimised_count);
-            break;
-        case '-':
-            code.insert(code.end(), {
-                    0x48, 0x81, 0x2B, 0x00, 0x00, 0x00, 0x00 // subq [rbx], optimised_count
-            });
-            WriteLittleEndian(code, code.size(), optimised_count);
-            break;
-        case '.':
-            code.insert(code.end(), {
-                    0x48, 0x0F, 0xB6, 0x3B, // movzxb (%rbx), %rdi
-                    0x41, 0xFF, 0xD4        // call %r12
-            });
-            break;
-        case ',':
-            code.insert(code.end(), {
-                    0x41, 0xFF, 0xD5, // call %r13
-                    0x88, 0x03        // mov (%rbx), %al
-            });
-            break;
-        case '[':
-            code.insert(code.end(), {
-                    0x80, 0x3B, 0x00, // cmpb [%rbx], 0
-                    0x0F, 0x84, 0x00, 0x00, 0x00, 0x00 // je matching ]
-            });
-            open_brackets_offsets_stack.push_back(code.size());
-            break;
-        case ']': {
-            code.insert(code.end(), {
-                    0x80, 0x3B, 0x00, // cmpb [%rbx], 0
-                    0x0F, 0x85, 0x00, 0x00, 0x00, 0x00 // jne matching ]
-            });
+static bool CanOptimise(std::string &program, std::string::iterator &instr) {
+    return IsOptimisableInstr(*instr) && (instr + 1) != program.end() && *(instr + 1) == *instr;
+}
 
-            size_t corresponding_open_bracket_offset = open_brackets_offsets_stack.back();
-            open_brackets_offsets_stack.pop_back();
+static void AddInstructions(std::string program, std::vector<unsigned char> &code, bool optimised) {
 
-            size_t offset_btw_matching_brackets = code.size() - corresponding_open_bracket_offset;
-            WriteLittleEndian(code, corresponding_open_bracket_offset, offset_btw_matching_brackets);
-            WriteLittleEndian(code, code.size(), -offset_btw_matching_brackets);
+    std::vector<size_t> open_brackets_offsets_stack;
+
+    for (auto instr = program.begin(); instr < program.end(); instr++) {
+
+        size_t optimised_count;
+        for (optimised_count = 1; optimised && CanOptimise(program, instr); optimised_count++, instr++);
+
+        switch (*instr) {
+            case '>':
+                code.insert(code.end(), {
+                        0x48, 0x81, 0xC3, 0x00, 0x00, 0x00, 0x00 // add rbx, optimised_count
+                });
+                WriteLittleEndian(code, code.size(), optimised_count);
+                break;
+            case '<':
+                code.insert(code.end(), {
+                        0x48, 0x81, 0xEB, 0x00, 0x00, 0x00, 0x00 // sub rbx, optimised_count
+                });
+                WriteLittleEndian(code, code.size(), optimised_count);
+                break;
+            case '+':
+                code.insert(code.end(), {
+                        0x48, 0x81, 0x03, 0x00, 0x00, 0x00, 0x00  // addq [rbx], optimised_count
+                });
+                WriteLittleEndian(code, code.size(), optimised_count);
+                break;
+            case '-':
+                code.insert(code.end(), {
+                        0x48, 0x81, 0x2B, 0x00, 0x00, 0x00, 0x00 // subq [rbx], optimised_count
+                });
+                WriteLittleEndian(code, code.size(), optimised_count);
+                break;
+            case '.':
+                code.insert(code.end(), {
+                        0x48, 0x0F, 0xB6, 0x3B, // movzxb (%rbx), %rdi
+                        0x41, 0xFF, 0xD4        // call %r12
+                });
+                break;
+            case ',':
+                code.insert(code.end(), {
+                        0x41, 0xFF, 0xD5, // call %r13
+                        0x88, 0x03        // mov (%rbx), %al
+                });
+                break;
+            case '[':
+                code.insert(code.end(), {
+                        0x80, 0x3B, 0x00, // cmpb [%rbx], 0
+                        0x0F, 0x84, 0x00, 0x00, 0x00, 0x00 // je matching ]
+                });
+                open_brackets_offsets_stack.push_back(code.size());
+                break;
+            case ']': {
+                code.insert(code.end(), {
+                        0x80, 0x3B, 0x00, // cmpb [%rbx], 0
+                        0x0F, 0x85, 0x00, 0x00, 0x00, 0x00 // jne matching ]
+                });
+
+                size_t corresponding_open_bracket_offset = open_brackets_offsets_stack.back();
+                open_brackets_offsets_stack.pop_back();
+
+                size_t offset_btw_matching_brackets = code.size() - corresponding_open_bracket_offset;
+                WriteLittleEndian(code, corresponding_open_bracket_offset, offset_btw_matching_brackets);
+                WriteLittleEndian(code, code.size(), -offset_btw_matching_brackets);
+            }
+                break;
+            default:
+                break;
         }
-            break;
-        default:
-            break;
     }
 }
 
