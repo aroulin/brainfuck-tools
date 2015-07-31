@@ -6,7 +6,10 @@ static void AddPrologue();
 
 static void AddEpilogue();
 
-static void AddInstruction(char instr, std::vector<size_t> &open_brackets_stack, unsigned& brackets_cnt);
+static void AddInstruction(char instr, std::vector<size_t> &open_brackets_stack, unsigned &brackets_cnt,
+                           size_t optimised_count = 1);
+
+static bool CanBeOptimised(char instr);
 
 /*
  * Register Assignment:
@@ -18,25 +21,46 @@ void Brainfuck::Compile(std::string program, bool optimised) {
     unsigned brackets_cnt = 0;
 
     AddPrologue();
+
+    size_t optimised_count = 0;
+    char last_optimised_instr = 0;
     for (auto instr: program) {
-        AddInstruction(instr, open_brackets_stack, brackets_cnt);
+        if (optimised && instr == last_optimised_instr && CanBeOptimised(instr)) {
+            optimised_count++;
+        } else {
+            if (optimised_count > 0)
+                AddInstruction(last_optimised_instr, open_brackets_stack, brackets_cnt, optimised_count);
+            if (CanBeOptimised(instr)) {
+                last_optimised_instr = instr;
+                optimised_count = 1;
+            } else {
+                AddInstruction(instr, open_brackets_stack, brackets_cnt);
+                optimised_count = 0;
+            }
+        }
     }
+
     AddEpilogue();
 }
 
-static void AddInstruction(char instr, std::vector<size_t> &open_brackets_stack, unsigned& brackets_cnt) {
+static bool CanBeOptimised(char instr) {
+    return instr == '+' || instr == '-' || instr == '<' || instr == '>';
+}
+
+static void AddInstruction(char instr, std::vector<size_t> &open_brackets_stack, unsigned &brackets_cnt,
+                           size_t optimised_count) {
     switch (instr) {
         case '>':
-            std::cout << "inc %rbx" << std::endl;
+            std::cout << "add $" << optimised_count << ", %rbx" << std::endl;
             break;
         case '<':
-            std::cout << "dec %rbx" << std::endl;
+            std::cout << "sub $" << optimised_count << ", %rbx" << std::endl;
             break;
         case '+':
-            std::cout << "incb (%rbx)" << std::endl;
+            std::cout << "add $" << optimised_count << ", (%rbx)" << std::endl;
             break;
         case '-':
-            std::cout << "decb (%rbx)" << std::endl;
+            std::cout << "sub $" << optimised_count << ", (%rbx)" << std::endl;
             break;
         case '.':
             std::cout << "movzxb (%rbx), %rdi" << std::endl

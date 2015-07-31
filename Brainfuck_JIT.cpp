@@ -13,7 +13,7 @@ static void Execute(std::vector<unsigned char> &code);
 static void AddInstruction(char instr, std::vector<unsigned char> &code,
                            std::vector<size_t> &open_brackets_offsets_stack, size_t optimised_count = 1);
 
-bool CanBeOptimised(char instr);
+static bool CanBeOptimised(char instr);
 
 static void WriteLittleEndian(std::vector<unsigned char> &code, size_t offset, size_t value);
 
@@ -53,7 +53,7 @@ void Brainfuck::JIT(std::string program, bool optimised) {
     Execute(code);
 }
 
-bool CanBeOptimised(char instr) {
+static bool CanBeOptimised(char instr) {
     return instr == '+' || instr == '-' || instr == '<' || instr == '>';
 }
 

@@ -9,17 +9,19 @@ Brainfuck Compiler, JIT, Interpreter and Debugger
 
 ## How to use it
 
-      ./Brainfuck {-i | -d | -c | -j | -jo} program.bf [inputs.txt]
+      ./Brainfuck {-i | -d | -c | -co | -j | -jo} program.bf [inputs.txt]
 
   ```-i``` for the Interpreter
   
   ```-d``` for the Debugger
 
   ```-c``` for the Compiler
+  
+  ```-co``` for the optimised Compiler
 
   ```-j``` for the JIT
   
-  ```-jo``` for optimised JIT
+  ```-jo``` for the optimised JIT
 
   ```program.bf``` must be a text file containing the Brainfuck program to execute/compile
 
@@ -57,7 +59,7 @@ Debug the program using the following commands:
     d<x>-<y>: dump memory content between address x and y (y is optional to print the content of one cell only)
 
 
-## Example debugging:
+### Example debugging:
 
 Brainfuck program to execute ```2+3``` (Non-Brainfuck characters are comments)
 
@@ -100,8 +102,9 @@ Using samples/mandelbrot.bf program which prints the mandelbrot set
 | ------------- |----------:|
 | Interpreter   | 343.89s   |
 | Compiler      | 3.62s     |
+| Opt. Compiler | 1.64s     |
 | JIT           | 3.65s     |
-| JIT Optimised | 1.79s     |
+| Opt. JIT      | 1.79s     |
 
 
 
