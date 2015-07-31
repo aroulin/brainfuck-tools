@@ -23,7 +23,7 @@ namespace Brainfuck {
 
         void Step(unsigned num_steps);
 
-        void GoUntil(unsigned int target_instr_pointer, bool offset_is_from_end = false);
+        void GoUntil(unsigned long target_instr_pointer, bool offset_is_from_end = false);
 
         void Reset();
 

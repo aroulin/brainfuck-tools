@@ -83,6 +83,8 @@ void Interpreter::SingleStep() {
         case ',':
             *inputs >> memory[data_pointer];
             break;
+        default:
+            break;
     }
 
     instr_pointer++;
@@ -98,7 +100,7 @@ void Interpreter::Reset() {
     std::fill(memory.begin(), memory.end(), 0);
 }
 
-void Interpreter::GoUntil(unsigned target_instr_pointer, bool offset_is_from_end) {
+void Interpreter::GoUntil(unsigned long target_instr_pointer, bool offset_is_from_end) {
     if (offset_is_from_end)
         target_instr_pointer = program.size() - target_instr_pointer;
     while (!ProgramIsFinished() && instr_pointer != target_instr_pointer) {

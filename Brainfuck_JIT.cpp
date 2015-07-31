@@ -15,7 +15,7 @@ static void AddInstruction(char instr, std::vector<unsigned char> &code,
 
 static bool CanBeOptimised(char instr);
 
-static void WriteLittleEndian(std::vector<unsigned char> &code, size_t offset, size_t value);
+static void WriteLittleEndian(std::vector<unsigned char> &code, size_t offset, long value);
 
 /*
  * Register Assignment:
@@ -122,7 +122,7 @@ static void AddInstruction(char instr, std::vector<unsigned char> &code,
     }
 }
 
-static void WriteLittleEndian(std::vector<unsigned char> &code, size_t offset, size_t value) {
+static void WriteLittleEndian(std::vector<unsigned char> &code, size_t offset, long value) {
     code[offset - 4] = (unsigned char) (value & 0xFF);
     code[offset - 3] = (unsigned char) ((value >> 8) & 0xFF);
     code[offset - 2] = (unsigned char) ((value >> 16) & 0xFF);
