@@ -25,7 +25,7 @@ int main(int argc, char **argv) {
     // Read program
     std::string program;
     program_file.seekg(0, std::ios::end);
-    program.resize(program_file.tellg());
+    program.resize((unsigned long) program_file.tellg());
     program_file.seekg(0, std::ios::beg);
     program_file.read(&program[0], program.size());
     program_file.close();
@@ -48,27 +48,31 @@ int main(int argc, char **argv) {
         vm.Interpret(program);
     } else if (mode == "-d") {
         Debugger(vm, program);
-    } else if (mode == "-j") {
+    } else if (mode == "-j" || mode == "-jo") {
         if (argc == 4) {
             std::cout << "Unfortunately, you cannot specify a file for the inputs while using the JIT" << std::endl;
             exit(EXIT_FAILURE);
         }
-        Brainfuck::JIT(program);
-    } else if (mode == "-c") {
+        bool optimised = mode == "-jo";
+        Brainfuck::JIT(program, optimised);
+    } else if (mode == "-c" || mode == "-co") {
         if (argc == 4) {
             std::cout << "Unfortunately, you cannot specify a file for the inputs while using the compiler" <<
             std::endl;
             exit(EXIT_FAILURE);
         }
-        Brainfuck::Compile(program);
+        bool optimised = mode == "-co";
+        Brainfuck::Compile(program, optimised);
     } else {
         UsageAndExit();
     }
+
+    return 0;
 }
 
 void UsageAndExit() {
     std::cout << "USAGE:" << std::endl
-                             << "Interpreter { -i | -c | -j | -d } program.bf [inputs.txt]" << std::endl;
+                             << "Brainfuck { -i | -d | -c | -co | -j | -jo } program.bf [inputs.txt]" << std::endl;
     exit(EXIT_SUCCESS);
 }
 

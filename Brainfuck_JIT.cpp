@@ -22,7 +22,7 @@ static void WriteLittleEndian(std::vector<unsigned char> &code, size_t offset, s
  * r13: getchar
  */
 
-void Brainfuck::JIT(std::string program) {
+void Brainfuck::JIT(std::string program, bool optimised) {
     std::vector<unsigned char> code;
     std::vector<size_t> open_brackets_offsets_stack;
 
@@ -77,7 +77,7 @@ static void AddInstruction(char instr, std::vector<unsigned char> &code,
             });
             open_brackets_offsets_stack.push_back(code.size());
             break;
-        case ']':
+        case ']': {
             code.insert(code.end(), {
                     0x80, 0x3B, 0x00, // cmpb [%rbx], 0
                     0x0F, 0x85, 0x00, 0x00, 0x00, 0x00 // jne matching ]
@@ -89,6 +89,9 @@ static void AddInstruction(char instr, std::vector<unsigned char> &code,
             size_t offset_btw_matching_brackets = code.size() - corresponding_open_bracket_offset;
             WriteLittleEndian(code, corresponding_open_bracket_offset, offset_btw_matching_brackets);
             WriteLittleEndian(code, code.size(), -offset_btw_matching_brackets);
+        }
+            break;
+        default:
             break;
     }
 }

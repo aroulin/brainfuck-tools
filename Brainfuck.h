@@ -8,8 +8,9 @@
 #include <set>
 
 namespace Brainfuck {
-    void JIT(std::string program);
-    void Compile(std::string program);
+    void JIT(std::string program, bool optimised = false);
+
+    void Compile(std::string program, bool optimised = false);
 
     class Interpreter {
     public:

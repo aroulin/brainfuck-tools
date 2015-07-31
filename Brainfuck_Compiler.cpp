@@ -13,7 +13,7 @@ static void AddInstruction(char instr, std::vector<size_t> &open_brackets_stack,
  * rbx: data_pointer
  */
 
-void Brainfuck::Compile(std::string program) {
+void Brainfuck::Compile(std::string program, bool optimised) {
     std::vector<size_t> open_brackets_stack;
     unsigned brackets_cnt = 0;
 
@@ -58,6 +58,8 @@ static void AddInstruction(char instr, std::vector<size_t> &open_brackets_stack,
                         << "jne begin_bracket_" << open_brackets_stack.back() << std::endl
                         << "end_bracket_" << open_brackets_stack.back() << ":" << std::endl;
             open_brackets_stack.pop_back();
+            break;
+        default:
             break;
     }
 }
