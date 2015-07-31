@@ -88,14 +88,18 @@ static void AddPrologue() {
                 << "push %rbp"          << std::endl
                 << "mov %rsp, %rbp"     << std::endl
                 << "push %rbx"          << std::endl
+                << "push %r12"          << std::endl
                 << "mov $30000, %rdi"   << std::endl
-                << "sub $8, %rsp"       << std::endl
-                << "call malloc"        << std::endl
-                << "mov %rax, %rbx"     << std::endl;
+                << "mov $1, %rsi"       << std::endl
+                << "call calloc"        << std::endl
+                << "mov %rax, %rbx"     << std::endl
+                << "mov %rax, %r12"     << std::endl;
 }
 
 static void AddEpilogue() {
     std::cout   << "add $8, %rsp"       << std::endl
+                << "mov %r12, %rdi"     << std::endl
+                << "call free"          << std::endl
                 << "pop %rbx"           << std::endl
                 << "pop %rbp"           << std::endl
                 << "retq"               << std::endl;
