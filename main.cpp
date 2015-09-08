@@ -1,7 +1,6 @@
 #include <fstream>
 #include <iostream>
 #include <regex>
-#include "gmock/gmock.h"
 #include "Brainfuck.h"
 
 void Debugger(Brainfuck::Interpreter &vm, std::string program);
